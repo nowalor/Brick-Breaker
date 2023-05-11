@@ -25,7 +25,11 @@ def handle_draw(paddle, ball_coords):
 
     pygame.draw.rect(SCREEN, "red", paddle)
     pygame.draw.circle(SCREEN, "green", ball_coords, BALL_RADIUS)
-
+    
+def handle_input(pressed_keys, has_fired):
+    if pressed_keys[pygame.K_SPACE] and not has_fired:
+            has_fired = True
+    return has_fired
 
 def main():
     running = True
@@ -67,8 +71,8 @@ def main():
             paddle.x += PADDLE_VEL
             if not has_fired:
                 ball_x += PADDLE_VEL
-        if pressed_keys[pygame.K_SPACE] and not has_fired:
-            has_fired = True
+                
+        has_fired = handle_input(pressed_keys, has_fired)
 
         # Handle ball movement
         if has_fired:
@@ -81,7 +85,7 @@ def main():
                 print(ball_x_offset)
             if ball_direction == "up":
                 ball_y -= ball_vel  # Goes up
-                
+
             if ball_x - ball_x_offset - BALL_RADIUS <= 0:  # Left wall hit
                 ball_x_offset = 2
             if ball_x + ball_x_offset + BALL_RADIUS >= WIDTH:  # Right wall hit
