@@ -26,10 +26,21 @@ def handle_draw(paddle, ball_coords):
     pygame.draw.rect(SCREEN, "red", paddle)
     pygame.draw.circle(SCREEN, "green", ball_coords, BALL_RADIUS)
     
-def handle_input(pressed_keys, has_fired):
+def handle_input(pressed_keys, has_fired, ball_x, paddle):
+    if pressed_keys[pygame.K_a] and paddle.x - PADDLE_VEL >= 0:  # LEFT
+        paddle.x -= PADDLE_VEL
+        if not has_fired:
+            ball_x -= PADDLE_VEL
+    if (
+        pressed_keys[pygame.K_d] and paddle.x + PADDLE_VEL + PLAYER_WIDTH <= WIDTH
+    ):  # RIGHT
+        paddle.x += PADDLE_VEL
+        if not has_fired:
+            ball_x += PADDLE_VEL
+                
     if pressed_keys[pygame.K_SPACE] and not has_fired:
             has_fired = True
-    return has_fired
+    return has_fired, ball_x
 
 def main():
     running = True
@@ -60,19 +71,7 @@ def main():
 
             pressed_keys = pygame.key.get_pressed()
 
-        # Handle key presses
-        if pressed_keys[pygame.K_a] and paddle.x - PADDLE_VEL >= 0:  # LEFT
-            paddle.x -= PADDLE_VEL
-            if not has_fired:
-                ball_x -= PADDLE_VEL
-        if (
-            pressed_keys[pygame.K_d] and paddle.x + PADDLE_VEL + PLAYER_WIDTH <= WIDTH
-        ):  # RIGHT
-            paddle.x += PADDLE_VEL
-            if not has_fired:
-                ball_x += PADDLE_VEL
-                
-        has_fired = handle_input(pressed_keys, has_fired)
+        has_fired, ball_x = handle_input(pressed_keys, has_fired, ball_x, paddle)
 
         # Handle ball movement
         if has_fired:
