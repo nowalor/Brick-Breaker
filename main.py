@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 
 pygame.init()
 
@@ -19,12 +19,33 @@ PLAYER_HEIGHT = 50
 
 BALL_RADIUS = 15
 
+BRICK_WIDTH = 150
+BRICK_HEIGHT = 50
+BRICK_COLORS = ["red", "green", "blue", "pink", "orange"]
+
+
+class Brick:
+    def __init__(self, coords):
+        self.y = coords["y"]
+        self.x = coords["x"]
+        self.color = random.choice(BRICK_COLORS)
+
+        self.draw_rect()
+        
+
+    def draw_rect(self):
+        rect = pygame.Rect(self.y, self.x, BRICK_WIDTH, BRICK_HEIGHT)
+        
+        return pygame.draw.rect(SCREEN, 'red', rect)
+
 
 def handle_draw(paddle, ball_coords):
     SCREEN.fill(WHITE)
 
     pygame.draw.rect(SCREEN, "red", paddle)
     pygame.draw.circle(SCREEN, "green", ball_coords, BALL_RADIUS)
+    
+    Brick({"x": 0, "y": 0})
 
 
 def handle_input(pressed_keys, has_fired, ball_x, paddle):
@@ -56,7 +77,6 @@ def handle_ball_movement(ball_y, ball_x, ball_direction, ball_x_offset, ball_vel
         ball_x_offset = -2
 
     ball_x += ball_x_offset  # Goes left / right
-
 
     return ball_y, ball_x, ball_x_offset
 
