@@ -25,7 +25,8 @@ def handle_draw(paddle, ball_coords):
 
     pygame.draw.rect(SCREEN, "red", paddle)
     pygame.draw.circle(SCREEN, "green", ball_coords, BALL_RADIUS)
-    
+
+
 def handle_input(pressed_keys, has_fired, ball_x, paddle):
     if pressed_keys[pygame.K_a] and paddle.x - PADDLE_VEL >= 0:  # LEFT
         paddle.x -= PADDLE_VEL
@@ -37,10 +38,28 @@ def handle_input(pressed_keys, has_fired, ball_x, paddle):
         paddle.x += PADDLE_VEL
         if not has_fired:
             ball_x += PADDLE_VEL
-                
+
     if pressed_keys[pygame.K_SPACE] and not has_fired:
-            has_fired = True
+        has_fired = True
     return has_fired, ball_x
+
+
+def handle_ball_movement(ball_y, ball_x, ball_direction, ball_x_offset, ball_vel):
+    if ball_direction == "up":
+        ball_y -= ball_vel  # Goes up
+    if ball_direction == "down":
+        ball_y += ball_vel
+
+    if ball_x - ball_x_offset - BALL_RADIUS <= 0:  # Left wall hit
+        ball_x_offset = 2
+    if ball_x + ball_x_offset + BALL_RADIUS >= WIDTH:  # Right wall hit
+        ball_x_offset = -2
+
+    ball_x += ball_x_offset  # Goes left / right
+
+
+    return ball_y, ball_x, ball_x_offset
+
 
 def main():
     running = True
@@ -75,26 +94,15 @@ def main():
 
         # Handle ball movement
         if has_fired:
-            if ball_y + ball_vel - 15 <= 0:  # Ceiling is hit
+            if ball_y + ball_vel - BALL_RADIUS <= 0:  # Ceiling is hit
                 ball_direction = "down"
-                # ball_x_offset = -ball_x_offset
             if paddle.collidepoint(ball_coords):  # Paddle is hit
                 ball_direction = "up"
                 ball_x_offset = (ball_coords[0] - paddle.centerx) / 25
-                print(ball_x_offset)
-            if ball_direction == "up":
-                ball_y -= ball_vel  # Goes up
 
-            if ball_x - ball_x_offset - BALL_RADIUS <= 0:  # Left wall hit
-                ball_x_offset = 2
-            if ball_x + ball_x_offset + BALL_RADIUS >= WIDTH:  # Right wall hit
-                ball_x_offset = -2
-
-                print(ball_x_offset)
-            ball_x += ball_x_offset  # Goes left / right
-
-            if ball_direction == "down":
-                ball_y += ball_vel
+            ball_y, ball_x, ball_x_offset = handle_ball_movement(
+                ball_y, ball_x, ball_direction, ball_x_offset, ball_vel
+            )
 
         handle_draw(paddle, ball_coords)
 
