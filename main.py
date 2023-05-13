@@ -33,8 +33,28 @@ class Brick:
         self.x = coords["x"]
         self.color = random.choice(BRICK_COLORS)
 
-        print({self.y, self.x})
         self.rect = pygame.Rect(self.x, self.y, BRICK_WIDTH, BRICK_HEIGHT)
+
+    def collide_ball(self, ball):
+        return self.rect.collidepoint(ball)
+
+
+def handle_detect_brick_collision(bricks, ball, ball_direction, ball_x_offset):
+    new_bricks = []
+
+    for brick in bricks:
+        if not brick.collide_ball(ball):
+            new_bricks.append(brick)
+
+        else:
+            if ball_direction == "up":
+                ball_direction == "down"
+            else:
+                ball_direction = "down"
+
+            ball_x_offset = random.uniform(-2, 2)
+
+    return (new_bricks, ball_direction, ball_x_offset)
 
 
 def handle_draw(paddle, ball_coords, bricks):
@@ -128,6 +148,9 @@ def main():
 
         # Handle ball movement
         if has_fired:
+            bricks, ball_direction, ball_x_offset = handle_detect_brick_collision(
+                bricks, ball_coords, ball_direction, ball_x_offset
+            )
             if ball_y + ball_vel - BALL_RADIUS <= 0:  # Ceiling is hit
                 ball_direction = "down"
             if paddle.collidepoint(ball_coords):  # Paddle is hit
@@ -137,8 +160,6 @@ def main():
             ball_y, ball_x, ball_x_offset = handle_ball_movement(
                 ball_y, ball_x, ball_direction, ball_x_offset, ball_vel
             )
-
-        # Generate Bricks
 
         handle_draw(paddle, ball_coords, bricks)
 
