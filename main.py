@@ -21,7 +21,10 @@ BALL_RADIUS = 15
 
 BRICK_WIDTH = 150
 BRICK_HEIGHT = 50
-BRICK_COLORS = ["red", "green", "blue", "pink", "orange"]
+BRICK_COLORS = ["red", "green", "blue", "pink", "orange", "black", "gray"]
+BRICK_ROWS = 3
+BRICK_COLS = 8
+BRICK_GAP = 12
 
 
 class Brick:
@@ -30,22 +33,18 @@ class Brick:
         self.x = coords["x"]
         self.color = random.choice(BRICK_COLORS)
 
-        self.draw_rect()
-        
-
-    def draw_rect(self):
-        rect = pygame.Rect(self.y, self.x, BRICK_WIDTH, BRICK_HEIGHT)
-        
-        return pygame.draw.rect(SCREEN, 'red', rect)
+        print({self.y, self.x})
+        self.rect = pygame.Rect(self.x, self.y, BRICK_WIDTH, BRICK_HEIGHT)
 
 
-def handle_draw(paddle, ball_coords):
+def handle_draw(paddle, ball_coords, bricks):
     SCREEN.fill(WHITE)
 
     pygame.draw.rect(SCREEN, "red", paddle)
     pygame.draw.circle(SCREEN, "green", ball_coords, BALL_RADIUS)
-    
-    Brick({"x": 0, "y": 0})
+
+    for brick in bricks:
+        pygame.draw.rect(SCREEN, brick.color, brick.rect)
 
 
 def handle_input(pressed_keys, has_fired, ball_x, paddle):
@@ -81,6 +80,19 @@ def handle_ball_movement(ball_y, ball_x, ball_direction, ball_x_offset, ball_vel
     return ball_y, ball_x, ball_x_offset
 
 
+def generate_bricks():
+    bricks = []
+
+    for i in range(BRICK_ROWS):
+        brick_y = (BRICK_HEIGHT + BRICK_GAP) * i
+        for x in range(BRICK_COLS):
+            brick_x = (BRICK_WIDTH + BRICK_GAP) * x
+
+            bricks.append(Brick({"y": brick_y, "x": brick_x}))
+
+    return bricks
+
+
 def main():
     running = True
 
@@ -100,6 +112,8 @@ def main():
     ball_vel = 3
     ball_direction = "up"
     ball_x_offset = 0
+
+    bricks = generate_bricks()
 
     while running:
         ball_coords = (ball_x, ball_y)
@@ -124,7 +138,9 @@ def main():
                 ball_y, ball_x, ball_direction, ball_x_offset, ball_vel
             )
 
-        handle_draw(paddle, ball_coords)
+        # Generate Bricks
+
+        handle_draw(paddle, ball_coords, bricks)
 
         pygame.display.flip()
 
